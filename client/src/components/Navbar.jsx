@@ -1,5 +1,7 @@
 import React from 'react';
 import { Plus, LayoutGrid, Home, RefreshCw } from 'lucide-react';
+import starbucksTM from '../assets/starbucks_tm.png';
+
 
 const Navbar = ({ activeView, onViewChange, onOpenCreate, onRefresh, isLoading }) => {
   return (
@@ -13,7 +15,7 @@ const Navbar = ({ activeView, onViewChange, onOpenCreate, onRefresh, isLoading }
           >
             <div className="w-10 h-10 rounded-full bg-sb-soft flex items-center justify-center p-1 group-hover:scale-105 transition-transform duration-200">
               <img
-                src="/logo.png"
+                src={starbucksTM}
                 alt="Starbucks Logo"
                 className="w-8 h-8 object-contain"
                 onError={(e) => {

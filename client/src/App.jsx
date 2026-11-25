@@ -14,6 +14,7 @@ import {
   updateProductStock,
   deleteProduct
 } from './services/api';
+import starbucksTM from './assets/starbucks_tm.png';
 
 function App() {
   const [activeView, setActiveView] = useState('landing'); // 'landing' | 'dashboard'
@@ -263,7 +264,7 @@ function App() {
       <footer className="border-t border-gray-200 bg-white py-6 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="Starbucks" className="w-5 h-5 object-contain" />
+            <img src={starbucksTM} alt="Starbucks" className="w-5 h-5 object-contain" />
             <span className="font-semibold text-gray-700">Starbucks Partner Inventory System</span>
             <span>•</span>
             <span>MERN Stack (MongoDB, Express, React, Node.js)</span>
