@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight, Plus, PackageCheck, AlertTriangle, Layers, Coffee, Sparkles, Database, ShieldCheck } from 'lucide-react';
 import StatsOverview from './StatsOverview';
+import starbucksTM from '../assets/starbucks_tm.png';
 
 const LandingPage = ({ stats, onNavigateDashboard, onOpenCreate, lowStockProducts, onSelectProduct }) => {
   return (
@@ -50,7 +51,7 @@ const LandingPage = ({ stats, onNavigateDashboard, onOpenCreate, lowStockProduct
             <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-full bg-gradient-to-tr from-white/15 to-white/5 p-4 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-2xl relative group">
               <div className="absolute inset-2 rounded-full border border-sb-gold/30 animate-pulse pointer-events-none" />
               <img
-                src="/logo.png"
+                src={starbucksTM}
                 alt="Starbucks Siren Logo"
                 className="w-36 h-36 sm:w-44 sm:h-44 object-contain filter drop-shadow-xl transform group-hover:scale-105 transition-transform duration-300"
               />
