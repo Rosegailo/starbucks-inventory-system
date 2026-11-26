@@ -16,6 +16,7 @@ const dotenv = require('dotenv');
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const Product = require('../models/Product');
+const { ensureStaticBranchUser, getStaticBranchAccount } = require('../utils/seedUsers');
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/starbucks_inventory';
 
@@ -202,6 +203,10 @@ async function seedData() {
     const inserted = await Product.insertMany(productsToInsert);
     console.log(`✨ Successfully imported ${inserted.length} Starbucks inventory products!`);
 
+    // Ensure static branch login account exists
+    await ensureStaticBranchUser({ force: true });
+    const branchAccount = getStaticBranchAccount();
+
     // Print summary stats
     const totalCategories = await Product.distinct('category');
     const outOfStockCount = await Product.countDocuments({ stock: 0 });
@@ -212,6 +217,9 @@ async function seedData() {
     console.log(`   - Categories:       ${totalCategories.length} (${totalCategories.join(', ')})`);
     console.log(`   - Out of Stock (0): ${outOfStockCount}`);
     console.log(`   - Low Stock (<15):  ${lowStockCount}`);
+    console.log(`\n🔐 Branch Login Account:`);
+    console.log(`   - Branch:  ${branchAccount.storeLocation}`);
+    console.log(`   - User ID: ${branchAccount.partnerId}`);
     console.log(`======================================================\n`);
 
     await mongoose.disconnect();

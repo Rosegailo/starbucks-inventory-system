@@ -5,12 +5,18 @@ const dotenv = require('dotenv');
 const path = require('path');
 const connectDB = require('./config/db');
 const productRoutes = require('./routes/productRoutes');
+const authRoutes = require('./routes/authRoutes');
+const { ensureStaticBranchUser } = require('./utils/seedUsers');
 
 // Load environment variables
 dotenv.config();
 
-// Initialize MongoDB Connection
-connectDB();
+// Initialize MongoDB Connection and ensure static branch user if empty
+connectDB().then(() => {
+  ensureStaticBranchUser().catch((err) => {
+    console.error('Warning: Could not initialize branch user:', err.message);
+  });
+});
 
 const app = express();
 
@@ -39,6 +45,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // API Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 
 // 404 Handler for undefined API routes

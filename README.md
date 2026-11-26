@@ -6,7 +6,12 @@ A complete full-stack **Starbucks Inventory Management System** built with Mongo
 
 ## 🌟 Core Features
 
-1. **Starbucks-Themed Landing Page**:
+1. **Single-Branch Partner Login (JWT Auth)**:
+   - Branded Starbucks Branch Portal login screen using static User ID and Password authentication.
+   - Salted `scrypt` password hashing and HS256 JWT route protection across all `/api/products` endpoints.
+   - See [DATABASE_GUIDE.md](./DATABASE_GUIDE.md) for configuring your static branch credentials and connecting your already-setup MongoDB database (`starbucks_inventory`).
+
+2. **Starbucks-Themed Landing Page**:
    - Branded welcome screen featuring the Starbucks siren logo.
    - Live inventory overview & metrics (Total products, categories, units, and total store retail value).
    - Low-stock and out-of-stock alert spotlight cards with 1-click drill-down.

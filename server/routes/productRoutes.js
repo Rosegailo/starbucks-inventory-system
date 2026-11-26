@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { protect } = require('../middleware/authMiddleware');
 const {
   getProducts,
   getStats,
@@ -9,6 +10,9 @@ const {
   updateStock,
   deleteProduct
 } = require('../controllers/productController');
+
+// Require authenticated partner for all inventory endpoints
+router.use(protect);
 
 // Stats route (must be before :id route)
 router.get('/stats', getStats);

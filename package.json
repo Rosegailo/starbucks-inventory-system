@@ -8,7 +8,8 @@
     "server": "npm --prefix server run dev",
     "client": "npm --prefix client run dev",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "seed": "npm --prefix server run seed"
+    "seed": "npm --prefix server run seed",
+    "seed:users": "npm --prefix server run seed:users"
   },
   "keywords": [
     "starbucks",
