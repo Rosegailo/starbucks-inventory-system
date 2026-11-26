@@ -5,6 +5,7 @@ import InventoryDashboard from './components/InventoryDashboard';
 import ProductFormModal from './components/ProductFormModal';
 import ProductDetailModal from './components/ProductDetailModal';
 import DeleteConfirmModal from './components/DeleteConfirmModal';
+import LoginPage from './components/LoginPage';
 import Toast from './components/Toast';
 import {
   getProducts,
@@ -12,11 +13,18 @@ import {
   createProduct,
   updateProduct,
   updateProductStock,
-  deleteProduct
+  deleteProduct,
+  getCurrentUser,
+  getStoredToken,
+  getStoredUser,
+  logoutUser,
+  setUnauthorizedHandler
 } from './services/api';
 import starbucksTM from './assets/starbucks_tm.png';
 
 function App() {
+  const [user, setUser] = useState(() => getStoredUser());
+  const [isCheckingAuth, setIsCheckingAuth] = useState(() => Boolean(getStoredToken()));
   const [activeView, setActiveView] = useState('landing'); // 'landing' | 'dashboard'
   const [products, setProducts] = useState([]);
   const [stats, setStats] = useState(null);
@@ -46,8 +54,50 @@ function App() {
     setToast({ message, type });
   };
 
+  // Verify stored token on mount and listen for 401 expiry
+  useEffect(() => {
+    setUnauthorizedHandler((msg) => {
+      setUser(null);
+      setProducts([]);
+      setStats(null);
+      setActiveView('landing');
+      setToast({ message: msg, type: 'error' });
+    });
+
+    const token = getStoredToken();
+    if (!token) {
+      setUser(null);
+      setIsCheckingAuth(false);
+      return;
+    }
+
+    let cancelled = false;
+    getCurrentUser()
+      .then((res) => {
+        if (!cancelled && res?.success) {
+          setUser(res.user);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          logoutUser();
+          setUser(null);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsCheckingAuth(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   // Fetch Inventory Stats
   const loadStats = useCallback(async () => {
+    if (!user) return;
     try {
       const res = await getInventoryStats();
       if (res && res.success) {
@@ -59,10 +109,11 @@ function App() {
     } catch (err) {
       console.warn('Could not load inventory stats:', err.message);
     }
-  }, []);
+  }, [user]);
 
   // Fetch Products based on current filters
   const loadProducts = useCallback(async () => {
+    if (!user) return;
     setIsLoading(true);
     try {
       let sortField = 'createdAt';
@@ -106,13 +157,34 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [searchQuery, selectedCategory, selectedStatus, sortBy]);
+  }, [user, searchQuery, selectedCategory, selectedStatus, sortBy]);
 
-  // Initial load
+  // Load inventory once authenticated
   useEffect(() => {
-    loadProducts();
-    loadStats();
-  }, [loadProducts, loadStats]);
+    if (user && !isCheckingAuth) {
+      loadProducts();
+      loadStats();
+    }
+  }, [user, isCheckingAuth, loadProducts, loadStats]);
+
+  const handleAuthSuccess = (authenticatedUser, message) => {
+    setUser(authenticatedUser);
+    setActiveView('landing');
+    showToast(message || `Welcome, ${authenticatedUser.name}!`, 'success');
+  };
+
+  const handleLogout = () => {
+    logoutUser();
+    setUser(null);
+    setProducts([]);
+    setStats(null);
+    setDetailProduct(null);
+    setEditingProduct(null);
+    setDeletingProduct(null);
+    setIsFormOpen(false);
+    setActiveView('landing');
+    showToast('Signed out successfully.', 'info');
+  };
 
   // Debounced search could be used, or useEffect dependency
   const handleResetFilters = () => {
@@ -200,6 +272,30 @@ function App() {
     (p) => p.stock !== undefined && p.stock < 15
   );
 
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-[#F2F0EB] flex flex-col items-center justify-center gap-4">
+        <div className="w-16 h-16 rounded-full bg-white shadow-md flex items-center justify-center p-2">
+          <img src={starbucksTM} alt="Starbucks" className="w-11 h-11 object-contain animate-pulse" />
+        </div>
+        <p className="text-sm font-semibold text-sb-dark">Verifying Partner session...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <>
+        <LoginPage onAuthSuccess={handleAuthSuccess} />
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast({ message: '', type: 'info' })}
+        />
+      </>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#F7F7F6]">
       {/* Top Navigation */}
@@ -216,6 +312,8 @@ function App() {
           showToast('Inventory refreshed', 'info');
         }}
         isLoading={isLoading}
+        user={user}
+        onLogout={handleLogout}
       />
 
       {/* Main Content Area */}

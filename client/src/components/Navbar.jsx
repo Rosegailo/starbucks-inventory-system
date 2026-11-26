@@ -1,9 +1,9 @@
 import React from 'react';
-import { Plus, LayoutGrid, Home, RefreshCw } from 'lucide-react';
+import { Plus, LayoutGrid, Home, RefreshCw, LogOut, UserCheck } from 'lucide-react';
 import starbucksTM from '../assets/starbucks_tm.png';
 
 
-const Navbar = ({ activeView, onViewChange, onOpenCreate, onRefresh, isLoading }) => {
+const Navbar = ({ activeView, onViewChange, onOpenCreate, onRefresh, isLoading, user, onLogout }) => {
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -83,8 +83,31 @@ const Navbar = ({ activeView, onViewChange, onOpenCreate, onRefresh, isLoading }
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-sb-green hover:bg-sb-hover text-white shadow-sm hover:shadow-md transition"
             >
               <Plus className="w-4 h-4" />
-              <span>Add Product</span>
+              <span className="hidden sm:inline">Add Product</span>
             </button>
+
+            {/* Partner Profile & Logout */}
+            {user && (
+              <div className="flex items-center gap-2 pl-2 border-l border-gray-200">
+                <div className="hidden md:flex items-center gap-2 bg-sb-soft/70 px-2.5 py-1.5 rounded-xl border border-sb-light">
+                  <UserCheck className="w-3.5 h-3.5 text-sb-green" />
+                  <div className="leading-tight">
+                    <p className="text-[11px] font-bold text-gray-900">{user.name}</p>
+                    <p className="text-[10px] text-sb-green font-semibold">
+                      {user.partnerId || user.role}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={onLogout}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-xs font-semibold text-gray-600 hover:text-red-700 hover:bg-red-50 border border-transparent hover:border-red-200 transition"
+                  title="Sign Out"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="hidden lg:inline">Sign Out</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
